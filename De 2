@@ -1,0 +1,60 @@
+def read_books(filename):
+    try:
+        with open(filename, 'r') as file:
+            lines = file.readlines()
+            return [line.strip() for line in lines]
+    except FileNotFoundError:
+        return []
+
+def write_books(filename, books):
+    with open(filename, 'w') as file:
+        for book in books:
+            file.write('\n'.join(book) + '\n\n')
+
+def input_book():
+    ten_sach = input("Nhập tên sách: ")
+    ten_tac_gia = input("Nhập tên tác giả: ")
+    nha_xuat_ban = input("Nhập tên nhà xuất bản: ")
+    nam_xb = int(input("Nhập năm xuất bản: "))
+    gia_ban = float(input("Nhập giá bán: "))
+    return [ten_sach, ten_tac_gia, nha_xuat_ban, str(nam_xb), str(gia_ban)]
+
+def display_books(books):
+    print("\nTổng số cuốn sách:", len(books))
+    print("{:<30} {:<30} {:<10} {:<10}".format("Tên sách", "Tên tác giả", "Năm XB", "Giá"))
+    for book in books:
+        print("{:<30} {:<30} {:<10} {:<10}".format(*book))
+
+def sort_books(books):
+    return sorted(books, key=lambda x: (int(x[3]), -float(x[4])))
+
+def main():
+    filename = "FU.txt"
+    books = read_books(filename)
+
+    while True:
+        print("\n===========================================")
+        print("1. Nhập thông tin của n cuốn sách")
+        print("2. In ra màn hình thông tin vừa nhập")
+        print("3. Sắp xếp thông tin giảm dần theo năm xuất bản và hiển thị")
+        print("4. Thoát")
+        choice = input("Chọn chức năng (1/2/3/4): ")
+
+        if choice == '1':
+            n = int(input("Nhập số lượng cuốn sách: "))
+            for _ in range(n):
+                books.append(input_book())
+            write_books(filename, books)
+        elif choice == '2':
+            display_books(books)
+        elif choice == '3':
+            sorted_books = sort_books(books)
+            write_books("F.txt", sorted_books)
+            print("Dữ liệu đã được sắp xếp và ghi vào tệp F.txt")
+        elif choice == '4':
+            break
+        else:
+            print("Lựa chọn không hợp lệ. Vui lòng chọn lại.")
+
+if __name__ == "__main__":
+    main()
