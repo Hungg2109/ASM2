@@ -1,0 +1,83 @@
+def read_stock_data(filename):
+    try:
+        with open(filename, 'r') as file:
+            lines = file.readlines()
+            return [line.strip().split() for line in lines]
+    except FileNotFoundError:
+        return []
+
+def calculate_average_diff(stock_data):
+    total_diff = 0
+    count = 0
+    for _, open_price, close_price in stock_data:
+        diff = float(close_price) - float(open_price)
+        total_diff += diff
+        count += 1
+    if count > 0:
+        return total_diff / count
+    return 0
+
+def display_stock_data(stock_data):
+    print("\nTổng số mã chứng khoán:", len(stock_data))
+    print("{:<10} {:<10} {:<10}".format("Mã CK", "Giá trung bình", "Hiệu (đóng - mở)"))
+    for stock, open_price, close_price in stock_data:
+        diff = float(close_price) - float(open_price)
+        print("{:<10} {:<10.3f} {:<10.3f}".format(stock, diff, float(close_price)))
+
+def search_stock_by_code(stock_data, code):
+    found = False
+    max_close = float("-inf")
+    min_close = float("inf")
+    for stock, open_price, close_price in stock_data:
+        if stock == code:
+            found = True
+            max_close = max(max_close, float(close_price))
+            min_close = min(min_close, float(close_price))
+    if found:
+        print(f"\nMã chứng khoán {code}:")
+        print(f"Giá đóng cửa cao nhất: {max_close:.3f}")
+        print(f"Giá đóng cửa thấp nhất: {min_close:.3f}")
+    else:
+        print(f"\nKhông tìm thấy mã chứng khoán {code} trong dữ liệu.")
+
+def search_trending_stocks(stock_data):
+    trending_stocks = set()
+    for i in range(len(stock_data) - 1):
+        stock1, open1, close1 = stock_data[i]
+        stock2, open2, close2 = stock_data[i + 1]
+        if close1 > open1 and close2 > open2:
+            trending_stocks.add(stock1)
+            trending_stocks.add(stock2)
+    return trending_stocks
+
+def main():
+    filename = "data.txt"
+    stock_data = read_stock_data(filename)
+
+    while True:
+        print("\n===========================================")
+        print("1. Đọc file và hiển thị thông tin")
+        print("2. Tìm kiếm theo mã chứng khoán")
+        print("3. Tìm kiếm mã chứng khoán có xu hướng tăng")
+        print("4. Thoát")
+        choice = input("Chọn chức năng (1/2/3/4): ")
+
+        if choice == '1':
+            average_diff = calculate_average_diff(stock_data)
+            display_stock_data(stock_data)
+            print(f"\nGiá trung bình của hiệu (đóng - mở) trong 10 ngày: {average_diff:.3f}")
+        elif choice == '2':
+            code = input("Nhập mã chứng khoán: ")
+            search_stock_by_code(stock_data, code)
+        elif choice == '3':
+            trending_stocks = search_trending_stocks(stock_data)
+            print("\nCác mã chứng khoán có xu hướng tăng trong cả ngày 1 và ngày 2:")
+            for stock in trending_stocks:
+                print(stock)
+        elif choice == '4':
+            break
+        else:
+            print("Lựa chọn không hợp lệ. Vui lòng chọn lại.")
+
+if __name__ == "__main__":
+    main()
